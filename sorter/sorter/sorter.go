@@ -10,9 +10,9 @@ import (
 )
 
 var (
-    infile *string = flag.String("i","infile","File contains values for sorting")
-    outfile *string = flag.String("o","outfile","File to resive sorted values")
-    algorithm *string = flag.String("a","qsort","Sort algorithm")
+    infile = flag.String("i","infile","File contains values for sorting")
+    outfile = flag.String("o","outfile","File to resive sorted values")
+    algorithm = flag.String("a","qsort","Sort algorithm")
 )
 
 func readValues(infile string) (values []int, err error) {
@@ -64,6 +64,26 @@ func readValues(infile string) (values []int, err error) {
     return
 }
 
+func writeValues(values []int, outfile string) error {
+    // 创建文件并打开
+    file, err := os.Create(outfile)
+    if err != nil{
+        fmt.Println("Failed to create the output file ", err)
+        return err
+    }
+    defer file.Close()
+
+    // 循环读取切片中的数据并将其写入到文件中
+    for _, value := range values{
+        // 将 int 类型转换为 string 类型
+        str := strconv.Itoa(value)
+        // 写入到文件中
+        file.WriteString(str + "\n")
+    }
+
+    return nil
+}
+
 func main()  {
     flag.Parse()
 
@@ -71,10 +91,20 @@ func main()  {
         fmt.Println("infile = ", *infile, "outfile = ", *outfile, "algorithm = ", *algorithm)
     }
 
+    // 读取文件并打印
     values, err := readValues(*infile)
     if err != nil{
         fmt.Println(err)
-    } else {
-        fmt.Println("Read values:", values)
+        return
     }
+    fmt.Println("Read values:", values)
+
+    // 将读取到的文件写入到文件中
+    err1 := writeValues(values, *outfile)
+    if err1 != nil{
+        fmt.Println(err1);
+        return
+    }
+    fmt.Println("Write values to file ", *outfile, " successed.")
+    
 }
