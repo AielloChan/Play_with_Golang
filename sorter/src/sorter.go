@@ -7,7 +7,9 @@ import (
 	"bufio"
 	"io"
 	"strconv"
+	"time"
     "./algorithms/qsort"
+    "./algorithms/bubblesort"
 )
 
 var (
@@ -88,26 +90,40 @@ func writeValues(values []int, outfile string) error {
 func main()  {
     flag.Parse()
 
-    if infile != nil{
-        fmt.Println("infile = ", *infile, "outfile = ", *outfile, "algorithm = ", *algorithm)
-    }
+    // 打印参数
+    // if infile != nil{
+    //     fmt.Println("infile = ", *infile, "outfile = ", *outfile, "algorithm = ",
+    //         *algorithm)
+    // }
 
-    // 读取文件并打印
+    // 读取文件
     values, err := readValues(*infile)
-    if err != nil{
+
+    if err == nil{
+        t1 := time.Now()
+        
+        switch *algorithm {
+            
+            case "qsort":
+                qsort.QuikSort(values)
+            
+            case "bubblesort":
+                bubblesort.BubbleSort(values)
+            
+            default:
+                fmt.Println("Sorting algrithm", *algorithm, 
+                    "is either unknown or unsupported.")
+        }
+        
+        t2 := time.Now()
+
+        fmt.Println("The sorting process costs ", t2.Sub(t1), " to complete.")
+
+        writeValues(values, *outfile)
+
+    } else {
+        
         fmt.Println(err)
-        return
-    }
-    fmt.Println("Read values:", values)
-
-    qsort.QuikSort(values)
-
-    // 将读取到的文件写入到文件中
-    err1 := writeValues(values, *outfile)
-    if err1 != nil{
-        fmt.Println(err1);
-        return
-    }
-    fmt.Println("Write values to file ", *outfile, " successed.")
-    
+        
+    }   
 }
