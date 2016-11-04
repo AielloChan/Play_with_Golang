@@ -7,7 +7,7 @@ import (
 	"bufio"
 	"io"
 	"strconv"
-    "./algorithms/bubblesort"
+    "./algorithms/qsort"
 )
 
 var (
@@ -100,7 +100,7 @@ func main()  {
     }
     fmt.Println("Read values:", values)
 
-    bubblesort.BubbleSort(values)
+    qsort.QuikSort(values)
 
     // 将读取到的文件写入到文件中
     err1 := writeValues(values, *outfile)
