@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Upload</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="/assets/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <form method="POST" action="/upload" enctype="multipart/form-data">
+        <label for="inputFile">Choose an image to upload:</label>
+        <input name="image" type="file" id="inputFile"/>
+        <br/>
+        <button type="submit" class="btn btn-primary">Upload</button>
+    </form>
+</body>
+
+</html>
