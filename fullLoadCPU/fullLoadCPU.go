@@ -1,22 +1,22 @@
 package main
 
 import (
-    "runtime"
+	"runtime"
 )
 
 func main() {
 
-    runtime.GOMAXPROCS(runtime.NumCPU())
-    
-    for i := 0; i < runtime.NumCPU(); i++ {
-        go func() {
-            for {
+	runtime.GOMAXPROCS(runtime.NumCPU())
 
-            }
-        }()
-    }
+	for i := 0; i < runtime.NumCPU(); i++ {
+		go func() {
+			for {
 
-    for {
+			}
+		}()
+	}
 
-    }
+	for {
+
+	}
 }

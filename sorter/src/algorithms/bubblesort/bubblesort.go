@@ -8,7 +8,7 @@ func BubbleSort(values []int) {
 		for j := i + 1; j < len(values); j++ {
 
 			if values[i] > values[j] {
-				
+
 				values[i], values[j] = values[j], values[i]
 			}
 		}

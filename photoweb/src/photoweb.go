@@ -1,21 +1,21 @@
 package main
 
 import (
+	"html/template"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
-	"html/template"
 	"path"
 	"runtime/debug"
 )
 
 // 定义常量
 const (
-	UploadDir = "./uploads"
+	UploadDir   = "./uploads"
 	TemplateDir = "./views"
-	ListDir = 0x0001
+	ListDir     = 0x0001
 )
 
 // 定义模板缓存容器
@@ -24,7 +24,7 @@ var (
 )
 
 // 此函数会在 main 函数之前执行
-func init()  {
+func init() {
 	// 读取 views 目录并获取里面的模板
 	fileInfoArr, err := ioutil.ReadDir(TemplateDir)
 	if err != nil {
@@ -86,7 +86,7 @@ func uploadHandler(w http.ResponseWriter, r *http.Request) {
 
 		_, err = io.Copy(t, f)
 		check(err)
-		
+
 		http.Redirect(w, r, "/view?id="+filename, http.StatusFound)
 	}
 }
@@ -116,15 +116,15 @@ func listHandler(w http.ResponseWriter, r *http.Request) {
 		images = append(images, fileInfo.Name())
 	}
 	locals["images"] = images
-	
-	check(renderHTML(w, "list",locals))
+
+	check(renderHTML(w, "list", locals))
 }
 
 // 静态文件服务
-func staticDirHandler(mux *http.ServeMux, prefix string, staticDir string, flags int)  {
-	mux.HandleFunc(prefix, func(w http.ResponseWriter, r *http.Request)  {
+func staticDirHandler(mux *http.ServeMux, prefix string, staticDir string, flags int) {
+	mux.HandleFunc(prefix, func(w http.ResponseWriter, r *http.Request) {
 		// 从请求地址中得到本地文件地址
-		file := staticDir + r.URL.Path[len(prefix) - 1:]
+		file := staticDir + r.URL.Path[len(prefix)-1:]
 		if (flags & ListDir) == 0 {
 			if _, err := os.Stat(file); err != nil {
 				http.NotFound(w, r)
@@ -137,12 +137,12 @@ func staticDirHandler(mux *http.ServeMux, prefix string, staticDir string, flags
 
 // 渲染模板函数
 func renderHTML(w http.ResponseWriter, tmpl string, locals map[string]interface{}) (err error) {
-	err = templates[tmpl + ".html"].Execute(w, locals)
+	err = templates[tmpl+".html"].Execute(w, locals)
 	return
 }
 
 // 错误检查函数
-func check(err error)  {
+func check(err error) {
 	if err != nil {
 		panic(err)
 	}
@@ -150,7 +150,7 @@ func check(err error)  {
 
 // 错误处理函数
 func safeHandler(fn http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request)  {
+	return func(w http.ResponseWriter, r *http.Request) {
 		defer func() {
 			if err, ok := recover().(error); ok {
 				http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -158,7 +158,7 @@ func safeHandler(fn http.HandlerFunc) http.HandlerFunc {
 				log.Println(string(debug.Stack()))
 			}
 		}()
-		
-		fn(w,r)
+
+		fn(w, r)
 	}
 }
