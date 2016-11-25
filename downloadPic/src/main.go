@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"runtime"
 )
 
 const (
@@ -15,14 +16,17 @@ const (
 	NUM_THREED = 10
 )
 
+var (
+	reg *regexp.Regexp
+)
+
 func main() {
-	reg, _ := regexp.Compile("([^/]+)$")
+	reg, _ = regexp.Compile("([^/]+)$")
 
 	if data, success := getResource(API_URL); success {
 		if urls, success := resolveJSON(data); success {
 
 			var pipe = make(chan string, 100)
-			var ok = make(chan bool)
 
 			for _, url := range urls {
 
@@ -33,25 +37,39 @@ func main() {
 				}
 			}
 
-			go func() {
-				for {
-					select {
-					case url := <-pipe:
-						if imgData, success := getResource(url); success {
-							saveImg(imgData, FILE_PATH+"/"+reg.FindString(url))
-						}
-					default:
-						ok <- true
-						break
-					}
-				}
+			ok := runWithGoroutine(pipe, NUM_THREED)
 
-			}()
-
-			<-ok
+			for i := 0; i < NUM_THREED; i++ {
+				<-ok
+			}
 
 		}
 	}
+}
+
+// 多协程
+func runWithGoroutine(pipeIn <-chan string, numOfGoroutine int) <-chan bool {
+	isOK := make(chan bool)
+
+	for i := 0; i < numOfGoroutine; i++ {
+		go func(count int) {
+			for {
+				select {
+				case url := <-pipeIn:
+					runtime.Gosched()
+					log.Printf("Threed %d : ", count)
+					if imgData, success := getResource(url); success {
+						saveImg(imgData, FILE_PATH+"/"+reg.FindString(url))
+					}
+				default:
+					isOK <- true
+					break
+				}
+			}
+		}(i)
+	}
+
+	return isOK
 }
 
 // 从 json 中解析出图片 url
